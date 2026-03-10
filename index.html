@@ -75,14 +75,24 @@
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const idSurat = urlParams.get('id');
+    
     const apiURL = "https://script.google.com/macros/s/AKfycbzgAkLkrK6P7730ol5SZLh4agp9JhWdg9VweTuA5GbVqA8L2-mIr53NM92FdfDA2jEv/exec"; 
 
     if (idSurat) {
-        fetch(apiURL + "?id=" + encodeURIComponent(idSurat))
-        .then(res => res.json())
+        // Tampilkan loader
+        document.getElementById('loader').style.display = 'block';
+
+        // Fetch data dengan mode 'cors' dan handle redirect otomatis oleh Google
+        fetch(apiURL + "?id=" + encodeURIComponent(idSurat.trim()))
+        .then(response => {
+            if (!response.ok) throw new Error('Jaringan bermasalah');
+            return response.json();
+        })
         .then(data => {
             document.getElementById('loader').style.display = 'none';
-            if (data) {
+            
+            // Cek apakah data ditemukan (bukan null)
+            if (data && data.nomor) {
                 const rows = `
                     <tr><th>Nomor Surat</th><td class="separator">:</td><td>${data.nomor}</td></tr>
                     <tr><th>Tanggal Surat</th><td class="separator">:</td><td>${data.tanggal}</td></tr>
@@ -90,18 +100,27 @@
                     <tr><th>Tujuan Surat</th><td class="separator">:</td><td>${data.tujuan}</td></tr>
                     <tr><th>Penanggung Jawab</th><td class="separator">:</td><td>${data.pj}</td></tr>
                     <tr><th>Keterangan</th><td class="separator">:</td><td>${data.ket}</td></tr>
-                    <tr style="background-color: #fdfdfe;">
-                        <th>Database ID</th>
-                        <td class="separator">:</td>
-                        <td style="font-family: monospace; font-size: 0.85rem; color: #666;">${data.sheetId}</td>
+                    <tr style="background-color: #f9f9f9; font-size: 0.8em;">
+                        <th>Database ID</th><td class="separator">:</td><td style="word-break: break-all;">${data.sheetId}</td>
                     </tr>
                 `;
-                document.getElementById('result-rows').innerHTML = rows;
-                document.getElementById('content').style.display = 'block';
+                document.getElementById('data-rows').innerHTML = rows; // Pastikan ID ini sesuai di HTML Anda
+                document.getElementById('result-table').style.display = 'block';
+                document.getElementById('error-message').style.display = 'none';
             } else {
-                document.getElementById('error').style.display = 'block';
+                // Jika data null
+                document.getElementById('result-table').style.display = 'none';
+                document.getElementById('error-message').style.display = 'block';
             }
         })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('error-message').innerText = "Terjadi kesalahan koneksi ke database.";
+            document.getElementById('error-message').style.display = 'block';
+        });
+    } else {
+        document.getElementById('loader').innerHTML = "Harap scan QR Code resmi pada surat.";
     }
 </script>
 
