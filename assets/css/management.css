@@ -37,9 +37,8 @@ input:focus { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(29, 59, 74, 
 .password-control input { padding-right: 48px; }
 .password-toggle { position: absolute; top: 1px; right: 1px; display: grid; width: 42px; height: calc(100% - 2px); place-items: center; color: var(--muted); background: transparent; border: 0; cursor: pointer; }
 .password-icon { display: block; width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
-.icon-eye-off { display: none; }
-.password-toggle.is-visible .icon-eye { display: none; }
-.password-toggle.is-visible .icon-eye-off { display: block; }
+.eye-slash { display: none; }
+.password-toggle.is-visible .eye-slash { display: block; }
 .password-toggle:hover { color: var(--navy); }
 .password-toggle:focus-visible { outline: 2px solid var(--red); outline-offset: -3px; }
 select, textarea { width: 100%; padding: 13px 14px; color: var(--ink); background: #f8faf9; border: 1px solid var(--line); border-radius: 0; font: inherit; outline: none; }
