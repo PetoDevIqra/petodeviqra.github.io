@@ -80,6 +80,7 @@ function showLogin(message = '') {
 passwordToggle.addEventListener('click', () => {
     const isVisible = passwordInput.type === 'text';
     passwordInput.type = isVisible ? 'password' : 'text';
+    passwordToggle.classList.toggle('is-visible', !isVisible);
     passwordToggle.setAttribute('aria-label', isVisible ? 'Tampilkan kata sandi' : 'Sembunyikan kata sandi');
     passwordToggle.setAttribute('aria-pressed', String(!isVisible));
 });
