@@ -1,32 +1,80 @@
-# Vrai Admin
+# Vrai Management
 
-## Menyiapkan Google Apps Script
+Panduan instalasi dan deployment halaman manajemen Vrai.
 
-1. Buka Google Apps Script dan buat project baru.
-2. Salin isi `backend/Code.gs` ke project tersebut. `vrai-management/Code.gs` adalah salinan kompatibilitas lama; backend kanonis berada di folder `backend`.
-3. Untuk spreadsheet kosong, jalankan `setupSpreadsheet()` sekali. Fungsi ini membuat nama sheet dan header baris 1 secara otomatis. Data baru akan dimulai dari baris 2. Jika sheet sudah berisi data, fungsi hanya memeriksa strukturnya dan tidak menimpa data:
+## Struktur File
+
+- `manage/index.html`: halaman dashboard manajemen.
+- `manage/Code.gs`: backend Google Apps Script untuk login, sesi, dan pembuatan nomor surat.
+- `assets/js/management.js`: JavaScript dashboard manajemen.
+- `assets/css/management.css`: stylesheet dashboard manajemen.
+- `Code.gs`: backend Google Apps Script untuk verifikasi dokumen publik.
+- `index.html`: halaman portal dan verifikasi dokumen.
+
+## Prasyarat
+
+- Akun Google dengan akses ke Google Sheets dan Google Apps Script.
+- Repository yang sudah dipublikasikan melalui GitHub Pages.
+- Spreadsheet dengan ID yang sesuai dengan `spreadsheetId` di `manage/Code.gs`.
+
+## Instalasi Backend Manajemen
+
+1. Buka [Google Apps Script](https://script.google.com/) dan buat project baru.
+2. Salin seluruh isi `manage/Code.gs` ke file script project tersebut.
+3. Pastikan `spreadsheetId` di bagian `CONFIG` menunjuk ke spreadsheet yang benar.
+4. Jalankan fungsi `setupSpreadsheet()` satu kali. Fungsi ini membuat sheet dan header berikut:
+
    `01 SK`, `02 SU`, `03 SPm`, `04 Spb`, `05 SPp`, `06 Spn`, `07 SM`, `09 Sket`, `10 SR`, `11 SB`, `12 SPPD`, `13 SRT`, `14 PK`, `15 SPeng`.
-4. Jalankan `setAdminCredentials('nama-pengguna', 'password-minimal-12-karakter')` untuk membuat akun pertama. Jalankan fungsi yang sama lagi dengan username berbeda untuk menambahkan akun kedua atau akun berikutnya. Password minimal 12 karakter dan tidak disimpan plaintext.
-5. Deploy sebagai Web app. Pilih akun pemilik sebagai eksekutor dan akses sesuai kebutuhan aplikasi.
-6. Pastikan URL `/exec` hasil deployment sesuai dengan `API_URL` pada `assets/js/management.js`.
 
-## Portal Login Pusat
+5. Berikan izin yang diminta Google Apps Script.
+6. Jalankan fungsi `setAdminCredentials('nama-pengguna', 'password-minimal-12-karakter')` untuk membuat akun admin pertama.
+7. Untuk menambah atau memperbarui akun, jalankan fungsi yang sama dengan username dan password yang baru.
+8. Pilih **Deploy > New deployment**.
+9. Pilih tipe **Web app**.
+10. Atur **Execute as** ke akun pemilik script dan atur akses sesuai kebutuhan.
+11. Deploy, lalu salin URL yang berakhiran `/exec`.
+12. Masukkan URL tersebut sebagai `API_URL` di `assets/js/management.js`.
 
-- Buka `/` untuk login pusat dan melihat daftar aplikasi.
-- Manajemen Vrai dibuka dari kartu `Manajemen Vrai` atau langsung melalui `/vrai-management/`.
-- Jika `/vrai-management/` dibuka tanpa session, pengguna diarahkan ke login pusat dan dikembalikan ke manajemen setelah berhasil login.
-- Tambahkan aplikasi baru pada `config.yaml` di root repository tanpa membuat login baru.
+## Deployment Frontend
+
+1. Commit dan push seluruh repository ke GitHub.
+2. Di repository GitHub, buka **Settings > Pages**.
+3. Pilih branch publikasi dan folder root `/` sebagai source.
+4. Buka domain GitHub Pages atau domain pada `CNAME` untuk menguji portal.
+5. Halaman manajemen tersedia melalui `/manage/` jika folder dipublikasikan langsung, atau melalui route yang dipetakan oleh konfigurasi hosting.
+
+## Pengujian
+
+1. Buka halaman portal dan pastikan halaman dapat dimuat.
+2. Buka halaman manajemen.
+3. Login menggunakan akun admin yang dibuat di Apps Script.
+4. Pastikan daftar jenis surat muncul.
+5. Buat satu nomor surat percobaan.
+6. Pastikan nomor, QR code, dan data baru muncul di sheet yang sesuai.
+7. Buka URL verifikasi dari hasil tersebut untuk memastikan dokumen dapat ditemukan.
 
 ## Keamanan
 
-- Username dan password tidak dikirim atau disimpan di GitHub Pages. Backend hanya menyimpan hash SHA-256 password di Script Properties.
-- Semua akun disimpan sebagai daftar pada Script Property `ADMIN_USERS`; akun lama dari `ADMIN_USERNAME` dan `ADMIN_PASSWORD_HASH` akan dimigrasikan otomatis saat login atau saat akun baru dibuat.
-- Token sesi pusat disimpan dalam cookie `Secure` dan `SameSite=Lax` agar dapat dipakai lintas halaman aplikasi.
-- Jika “Ingat saya selama 12 jam” dicentang, cookie memiliki `Max-Age=43200`; jika tidak, cookie hanya berlaku sampai browser ditutup.
-- Metadata token sesi di server disimpan di `PropertiesService` dengan waktu kedaluwarsa 12 jam, dan logout menghapus cookie serta token server.
-- Percobaan login dibatasi 5 kali per 15 menit per username.
-- Sheet dan aksi tulis memakai whitelist backend; request tidak dapat memilih sheet atau baris arbitrer, sehingga mengurangi risiko IDOR.
-- Nomor urut dibuat di bawah `LockService` agar dua request bersamaan tidak menghasilkan nomor yang sama.
-- Record baru mengisi baris kosong pertama mulai baris 2; baris 1 digunakan sebagai header.
-- Input panjang dibatasi, tanggal divalidasi, nilai teks di-render dengan `textContent`, dan karakter formula Spreadsheet dinetralkan.
-- Untuk produksi, gunakan URL Web App dengan akses terbatas dan akun Google Workspace bila tersedia.
+- Jangan menyimpan password admin di repository.
+- Password hanya dikirim saat menjalankan `setAdminCredentials()` dan backend menyimpan hash-nya di Script Properties.
+- Batasi akses deployment Apps Script sesuai kebutuhan produksi.
+- Jangan membagikan URL deployment backend kepada pihak yang tidak berkepentingan.
+- Jika endpoint deployment berubah, perbarui `API_URL` di `assets/js/management.js` lalu deploy ulang frontend.
+
+## Troubleshooting
+
+### Daftar jenis surat tidak muncul
+
+Periksa URL `API_URL`, deployment Apps Script, dan izin akses Web app.
+
+### Login selalu gagal
+
+Jalankan kembali `setAdminCredentials()` dengan password minimal 12 karakter dan pastikan project Apps Script menggunakan spreadsheet yang benar.
+
+### Sheet belum ditemukan
+
+Jalankan `setupSpreadsheet()` dan pastikan nama sheet tidak diubah.
+
+### Nomor surat berhasil dibuat tetapi QR tidak dapat diverifikasi
+
+Periksa `verificationBaseUrl` di `manage/Code.gs` dan pastikan backend verifikasi pada `Code.gs` root sudah dipublikasikan.
