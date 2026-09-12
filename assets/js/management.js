@@ -28,7 +28,7 @@ function setBusy(button, busy) {
 }
 
 function setSessionCookie(token, remember) {
-    const maxAge = remember ? '; Max-Age=86400' : '';
+    const maxAge = remember ? '; Max-Age=604800' : '';
     document.cookie = `${SESSION_COOKIE}=${encodeURIComponent(token)}${maxAge}; Path=/; Secure; SameSite=Lax`;
     try {
         sessionStorage.setItem(SESSION_STORAGE_KEY, token);
