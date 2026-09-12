@@ -49,7 +49,11 @@ async function request(payload) {
     });
     if (!response.ok) throw new Error('Server tidak dapat dihubungi.');
     const data = await response.json();
-    if (!data.ok) throw new Error(data.message || 'Permintaan tidak dapat diproses.');
+    if (!data.ok) {
+        const error = new Error(data.message || 'Permintaan tidak dapat diproses.');
+        error.code = data.code;
+        throw error;
+    }
     return data;
 }
 
@@ -87,9 +91,13 @@ async function checkSession() {
         sessionToken = cookieToken;
         showDashboard(await request({ action: 'session', token: sessionToken }));
     } catch (error) {
-        sessionToken = null;
-        clearSessionCookie();
-        showLogin('Sesi berakhir. Silakan masuk kembali.');
+        if (error.code === 'UNAUTHORIZED') {
+            sessionToken = null;
+            clearSessionCookie();
+            showLogin('Sesi berakhir. Silakan masuk kembali.');
+            return;
+        }
+        showLogin('Layanan sesi sedang tidak tersedia. Coba lagi sebentar.');
     }
 }
 
@@ -144,7 +152,7 @@ letterForm.addEventListener('submit', async (event) => {
             resultPanel.focus({ preventScroll: true });
         });
     } catch (error) {
-        if (error.message.includes('Sesi')) {
+        if (error.code === 'UNAUTHORIZED') {
             sessionToken = null;
             clearSessionCookie();
             showLogin(error.message);
