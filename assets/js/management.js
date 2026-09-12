@@ -39,12 +39,13 @@ function setSessionCookie(token, remember) {
 
 function getSessionCookie() {
     const cookie = document.cookie.split('; ').find((item) => item.startsWith(`${SESSION_COOKIE}=`));
-    if (cookie) return decodeURIComponent(cookie.split('=').slice(1).join('='));
     try {
-        return sessionStorage.getItem(SESSION_STORAGE_KEY) || localStorage.getItem(SESSION_STORAGE_KEY);
+        const storedToken = sessionStorage.getItem(SESSION_STORAGE_KEY) || localStorage.getItem(SESSION_STORAGE_KEY);
+        if (storedToken) return storedToken;
     } catch (error) {
-        return null;
+        // Continue with the cookie fallback when browser storage is unavailable.
     }
+    return cookie ? decodeURIComponent(cookie.split('=').slice(1).join('=')) : null;
 }
 
 function clearSessionCookie() {
