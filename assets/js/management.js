@@ -1,5 +1,6 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbwIzQlz_v2HPai2eRfnd24BZ8JYNo5ybq-iw99gga9cv3aeeypiOLi4z8pYf_r8hpf7/exec';
 const SESSION_COOKIE = 'vrai_session';
+const SESSION_STORAGE_KEY = 'vrai_session_token';
 let sessionToken = null;
 
 const loginView = document.getElementById('login-view');
@@ -29,15 +30,29 @@ function setBusy(button, busy) {
 function setSessionCookie(token, remember) {
     const maxAge = remember ? '; Max-Age=86400' : '';
     document.cookie = `${SESSION_COOKIE}=${encodeURIComponent(token)}${maxAge}; Path=/; Secure; SameSite=Lax`;
+    try {
+        sessionStorage.setItem(SESSION_STORAGE_KEY, token);
+        if (remember) localStorage.setItem(SESSION_STORAGE_KEY, token);
+        else localStorage.removeItem(SESSION_STORAGE_KEY);
+    } catch (error) {}
 }
 
 function getSessionCookie() {
     const cookie = document.cookie.split('; ').find((item) => item.startsWith(`${SESSION_COOKIE}=`));
-    return cookie ? decodeURIComponent(cookie.split('=').slice(1).join('=')) : null;
+    if (cookie) return decodeURIComponent(cookie.split('=').slice(1).join('='));
+    try {
+        return sessionStorage.getItem(SESSION_STORAGE_KEY) || localStorage.getItem(SESSION_STORAGE_KEY);
+    } catch (error) {
+        return null;
+    }
 }
 
 function clearSessionCookie() {
     document.cookie = `${SESSION_COOKIE}=; Max-Age=0; Path=/; Secure; SameSite=Lax`;
+    try {
+        sessionStorage.removeItem(SESSION_STORAGE_KEY);
+        localStorage.removeItem(SESSION_STORAGE_KEY);
+    } catch (error) {}
 }
 
 async function request(payload) {
