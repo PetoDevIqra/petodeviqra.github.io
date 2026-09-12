@@ -113,7 +113,18 @@ async function checkSession() {
             showLogin('Sesi berakhir. Silakan masuk kembali.');
             return;
         }
-        showLogin('Layanan sesi sedang tidak tersedia. Coba lagi sebentar.');
+        try {
+            await new Promise((resolve) => setTimeout(resolve, 800));
+            showDashboard(await request({ action: 'session', token: sessionToken }));
+        } catch (retryError) {
+            if (retryError.code === 'UNAUTHORIZED') {
+                sessionToken = null;
+                clearSessionCookie();
+                showLogin('Sesi berakhir. Silakan masuk kembali.');
+                return;
+            }
+            showLogin('Layanan sesi sedang tidak tersedia. Coba muat ulang halaman.');
+        }
     }
 }
 
