@@ -27,13 +27,14 @@ Panduan instalasi dan deployment halaman manajemen Vrai.
    `01 SK`, `02 SU`, `03 SPm`, `04 Spb`, `05 SPp`, `06 Spn`, `07 SM`, `09 Sket`, `10 SR`, `11 SB`, `12 SPPD`, `13 SRT`, `14 PK`, `15 SPeng`.
 
 5. Berikan izin yang diminta Google Apps Script.
-6. Jalankan fungsi `setAdminCredentials('nama-pengguna', 'password-minimal-12-karakter')` untuk membuat akun admin pertama.
-7. Untuk menambah atau memperbarui akun, jalankan fungsi yang sama dengan username dan password yang baru.
-8. Pilih **Deploy > New deployment**.
-9. Pilih tipe **Web app**.
-10. Atur **Execute as** ke akun pemilik script dan atur akses sesuai kebutuhan.
-11. Deploy, lalu salin URL yang berakhiran `/exec`.
-12. Masukkan URL tersebut sebagai `API_URL` di `assets/js/management.js`.
+6. Pada project Apps Script yang berisi `Code.gs` root untuk verifikasi publik, buka **Project Settings > Script properties**, lalu tambahkan property `VERIFICATION_SECRET` dengan nilai acak yang panjang.
+7. Jalankan fungsi `setAdminCredentials('nama-pengguna', 'password-minimal-12-karakter')` untuk membuat akun admin pertama. Password wajib minimal 12 karakter.
+8. Untuk menambah atau memperbarui akun, jalankan fungsi yang sama dengan username dan password yang baru.
+9. Pilih **Deploy > New deployment**.
+10. Pilih tipe **Web app**.
+11. Atur **Execute as** ke akun pemilik script dan atur akses sesuai kebutuhan.
+12. Deploy, lalu salin URL yang berakhiran `/exec`.
+13. Masukkan URL tersebut sebagai `API_URL` di `assets/js/management.js`.
 
 ## Deployment Frontend
 
@@ -56,7 +57,9 @@ Panduan instalasi dan deployment halaman manajemen Vrai.
 ## Keamanan
 
 - Jangan menyimpan password admin di repository.
-- Password hanya dikirim saat menjalankan `setAdminCredentials()` dan backend menyimpan hash-nya di Script Properties.
+- Password hanya dikirim saat menjalankan `setAdminCredentials()` dan backend menyimpan hash-nya di Script Properties. Gunakan password minimal 12 karakter.
+- Endpoint manajemen hanya menerima aksi melalui `POST`; jangan mengirim username, password, atau token melalui URL `GET`.
+- `VERIFICATION_SECRET` wajib tersedia. Backend verifikasi akan berhenti jika property tersebut belum dikonfigurasi.
 - Batasi akses deployment Apps Script sesuai kebutuhan produksi.
 - Jangan membagikan URL deployment backend kepada pihak yang tidak berkepentingan.
 - Jika endpoint deployment berubah, perbarui `API_URL` di `assets/js/management.js` lalu deploy ulang frontend.
