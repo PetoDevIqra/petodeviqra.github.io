@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#eef1f2">
+    <title>Manajemen Vrai</title>
+    <link rel="icon" type="image/webp" href="/vrai/assets/img/LOGO-NEW.webp">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/vrai-management/assets/css/style.css">
+</head>
+<body>
+<div class="page">
+    <header class="site-header">
+        <a class="brand" href="/vrai/" aria-label="Kembali ke Vrai">
+            <img class="brand-mark" src="/vrai/assets/img/LOGO-NEW.webp" alt="Logo SD Islam Iqra Petobo">
+            <span class="brand-copy">
+                <span class="brand-name">Vrai</span>
+                <span class="brand-subtitle">Verifikasi Dokumen Asli</span>
+            </span>
+        </a>
+        <div class="header-actions">
+            <a class="back-link" href="/">Portal aplikasi</a>
+            <button class="text-button" id="logout-button" type="button" hidden>Keluar</button>
+        </div>
+    </header>
+
+    <main>
+        <section class="dashboard" id="dashboard-view" aria-labelledby="dashboard-title" hidden>
+            <div class="dashboard-heading">
+                <div>
+                    <p class="eyebrow">Ruang kerja</p>
+                    <h1 id="dashboard-title">Buat nomor surat.</h1>
+                    <p class="intro">Isi data surat. Nomor urut, nomor surat, dan QR akan dibuat otomatis.</p>
+                </div>
+                <div class="session-label">Masuk sebagai <strong id="session-user"></strong></div>
+            </div>
+            <form class="letter-form" id="letter-form">
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="sheet">Jenis surat</label>
+                        <select id="sheet" name="sheet" required></select>
+                    </div>
+                    <div class="field">
+                        <label for="date">Tanggal surat</label>
+                        <input id="date" name="date" type="date" required>
+                    </div>
+                    <div class="field field-wide">
+                        <label for="subject">Perihal</label>
+                        <input id="subject" name="subject" type="text" maxlength="500" required>
+                    </div>
+                    <div class="field">
+                        <label for="destination">Tujuan surat</label>
+                        <input id="destination" name="destination" type="text" maxlength="500" required>
+                    </div>
+                    <div class="field">
+                        <label for="person-in-charge">Penanggung jawab</label>
+                        <input id="person-in-charge" name="personInCharge" type="text" maxlength="500" required>
+                    </div>
+                    <div class="field field-wide">
+                        <label for="notes">Keterangan</label>
+                        <textarea id="notes" name="notes" rows="3" maxlength="500"></textarea>
+                    </div>
+                </div>
+                <div class="form-footer">
+                    <p class="form-message" id="letter-message" role="alert" hidden></p>
+                    <button class="submit-button" type="submit">Buat nomor surat</button>
+                </div>
+            </form>
+            <section class="result-panel" id="result-panel" aria-live="polite" tabindex="-1" hidden>
+                <div>
+                    <p class="eyebrow">Berhasil dibuat</p>
+                    <h2 id="result-number"></h2>
+                    <p class="result-meta" id="result-sheet"></p>
+                </div>
+                <div class="result-actions">
+                    <img id="result-qr" alt="QR code nomor surat">
+                    <div class="copy-fields">
+                        <label for="result-url">Tautan verifikasi</label>
+                        <div class="copy-row"><input id="result-url" type="text" readonly><button class="copy-button" type="button" data-copy="result-url">Salin</button></div>
+                        <button class="copy-number" type="button" data-copy="result-number">Salin nomor surat</button>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Vrai | SD Islam Iqra Petobo</p>
+    </footer>
+</div>
+<script src="/assets/js/app-config.js"></script>
+<script src="/vrai-management/assets/js/app.js" defer></script>
+</body>
+</html>

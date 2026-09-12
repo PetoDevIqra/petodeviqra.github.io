@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f1ede3">
+    <title>Vrai | Verifikasi Keaslian Dokumen</title>
+    <link rel="icon" type="image/webp" href="/vrai/assets/img/LOGO-NEW.webp">
+    <link rel="preconnect" href="https://script.google.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/vrai/assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+    <div class="brand">
+        <img class="brand-mark" src="/vrai/assets/img/LOGO-NEW.webp" alt="Logo SD Islam Iqra Petobo">
+        <div class="brand-copy">
+            <span class="brand-name">Vrai</span>
+            <span class="brand-subtitle">Verifikasi Dokumen Asli</span>
+        </div>
+    </div>
+</header>
+
+<main class="main-shell">
+    <section class="intro" aria-labelledby="page-title">
+        <div>
+            <p class="eyebrow">Validasi keaslian</p>
+            <h1 id="page-title">Yang resmi,<br><em>tercatat.</em></h1>
+        </div>
+        <p class="intro-note">Vrai membaca nomor surat dari QR dan mencocokkannya dengan catatan resmi sekolah untuk memastikan keasliannya.</p>
+    </section>
+
+    <section class="verification-surface" aria-live="polite">
+        <div class="surface-top">
+            <div class="surface-label"><span class="surface-dot"></span><span id="surface-label">Pemeriksaan aktif</span></div>
+            <span class="surface-id" id="surface-id">Menunggu nomor dokumen</span>
+        </div>
+        <div class="surface-body">
+            <div id="loader" class="state">
+                <div>
+                    <div class="loader-ring" aria-hidden="true"></div>
+                    <p class="state-title">Sebentar.</p>
+                    <p class="state-copy">Kami sedang mencocokkan nomor dokumen dengan catatan resmi.</p>
+                </div>
+            </div>
+
+            <div id="empty-state" class="state" data-tone="error" hidden>
+                <div>
+                    <p class="state-title">Nomor belum ada.</p>
+                    <p class="state-copy">Nomor surat ini tidak ditemukan di dalam catatan resmi. Periksa kembali QR atau nomor dokumennya.</p>
+                </div>
+            </div>
+
+            <div id="invalid-state" class="state" data-tone="error" hidden>
+                <div>
+                    <p class="state-title">Kode tidak cocok.</p>
+                    <p class="state-copy">Identitas dokumen ditemukan, tetapi kode verifikasinya berbeda dari catatan resmi.</p>
+                </div>
+            </div>
+
+            <article id="result" class="result" hidden>
+                <div class="result-head">
+                    <div>
+                        <p class="result-kicker" id="result-kicker">Dokumen tercatat</p>
+                        <h2 class="result-title" id="result-title">Dokumen terverifikasi</h2>
+                    </div>
+                    <div class="seal" aria-label="Dokumen valid">Tercatat<br>Resmi<br>Valid</div>
+                </div>
+
+                <dl class="details">
+                    <div class="detail detail--wide">
+                        <dt>Nomor surat</dt>
+                        <dd id="document-number">-</dd>
+                    </div>
+                    <div class="detail">
+                        <dt>Tanggal terbit</dt>
+                        <dd id="document-date">-</dd>
+                    </div>
+                    <div class="detail">
+                        <dt>Status</dt>
+                        <dd id="document-status">Terverifikasi</dd>
+                    </div>
+                    <div class="detail detail--wide">
+                        <dt>Perihal</dt>
+                        <dd id="document-subject">-</dd>
+                    </div>
+                    <div class="detail">
+                        <dt>Tujuan / penerima</dt>
+                        <dd id="document-recipient">-</dd>
+                    </div>
+                    <div class="detail">
+                        <dt>Penanggung jawab</dt>
+                        <dd id="document-owner">-</dd>
+                    </div>
+                    <div class="detail detail--wide detail--code">
+                        <dt>Kode verifikasi</dt>
+                        <dd id="document-code">-</dd>
+                    </div>
+                </dl>
+
+                <div class="verification-note">
+                    <span aria-hidden="true">◆</span>
+                    <div><strong id="verification-method">Fingerprint data</strong><span id="verification-message">Nomor ini cocok dengan catatan resmi sekolah.</span></div>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <p>&copy; 2026 Vrai | SD Islam Iqra Petobo<br>Verifikasi keaslian dokumen</p>
+    <p class="footer-right">Data ditampilkan apa adanya<br>dari catatan resmi.</p>
+</footer>
+
+<script src="/vrai/assets/js/app.js" defer></script>
+</body>
+</html>
