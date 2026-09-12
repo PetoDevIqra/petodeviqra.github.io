@@ -8,7 +8,7 @@
    `01 SK`, `02 SU`, `03 SPm`, `04 Spb`, `05 SPp`, `06 Spn`, `07 SM`, `09 Sket`, `10 SR`, `11 SB`, `12 SPPD`, `13 SRT`, `14 PK`, `15 SPeng`.
 4. Jalankan `setAdminCredentials('nama-pengguna', 'password-minimal-12-karakter')` untuk membuat akun pertama. Jalankan fungsi yang sama lagi dengan username berbeda untuk menambahkan akun kedua atau akun berikutnya. Password minimal 12 karakter dan tidak disimpan plaintext.
 5. Deploy sebagai Web app. Pilih akun pemilik sebagai eksekutor dan akses sesuai kebutuhan aplikasi.
-6. Salin URL `/exec` hasil deployment ke `apiUrl` pada `assets/js/app-config.js`.
+6. Pastikan URL `/exec` hasil deployment sesuai dengan `API_URL` pada `assets/js/management.js`.
 
 ## Portal Login Pusat
 

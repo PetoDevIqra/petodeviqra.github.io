@@ -1,4 +1,4 @@
-const API_URL = window.VRAI_CONFIG?.apiUrl || '';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwIzQlz_v2HPai2eRfnd24BZ8JYNo5ybq-iw99gga9cv3aeeypiOLi4z8pYf_r8hpf7/exec';
 const SESSION_COOKIE = 'vrai_session';
 let sessionToken = null;
 
