@@ -2,6 +2,9 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbwIzQlz_v2HPai2eRfnd24B
 const SESSION_COOKIE = 'vrai_session';
 let sessionToken = null;
 
+const loginView = document.getElementById('login-view');
+const loginForm = document.getElementById('login-form');
+const loginMessage = document.getElementById('login-message');
 const dashboardView = document.getElementById('dashboard-view');
 const letterForm = document.getElementById('letter-form');
 const letterMessage = document.getElementById('letter-message');
@@ -47,6 +50,7 @@ async function request(payload) {
 }
 
 function showDashboard(data) {
+    loginView.hidden = true;
     dashboardView.hidden = false;
     logoutButton.hidden = false;
     document.getElementById('session-user').textContent = data.username;
@@ -58,22 +62,48 @@ function showDashboard(data) {
     }));
 }
 
+function showLogin(message = '') {
+    loginView.hidden = false;
+    dashboardView.hidden = true;
+    logoutButton.hidden = true;
+    showMessage(loginMessage, message);
+}
+
 async function checkSession() {
     const cookieToken = getSessionCookie();
-    if (!cookieToken) return redirectToPortal();
+    if (!cookieToken) return showLogin();
     try {
         sessionToken = cookieToken;
         showDashboard(await request({ action: 'session', token: sessionToken }));
     } catch (error) {
         sessionToken = null;
         clearSessionCookie();
-        redirectToPortal();
+        showLogin('Sesi berakhir. Silakan masuk kembali.');
     }
 }
 
-function redirectToPortal() {
-    window.location.replace('/?next=' + encodeURIComponent('/vrai-management/'));
-}
+loginForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    showMessage(loginMessage, '');
+    const button = loginForm.querySelector('button[type="submit"]');
+    setBusy(button, true);
+    const formData = new FormData(loginForm);
+    try {
+        const data = await request({
+            action: 'login',
+            username: formData.get('username'),
+            password: formData.get('password')
+        });
+        sessionToken = data.token;
+        setSessionCookie(sessionToken);
+        loginForm.reset();
+        showDashboard(data);
+    } catch (error) {
+        showMessage(loginMessage, error.message);
+    } finally {
+        setBusy(button, false);
+    }
+});
 
 letterForm.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -106,7 +136,7 @@ letterForm.addEventListener('submit', async (event) => {
         if (error.message.includes('Sesi')) {
             sessionToken = null;
             clearSessionCookie();
-            redirectToPortal();
+            showLogin(error.message);
         }
         showMessage(letterMessage, error.message);
     } finally {
@@ -134,7 +164,7 @@ logoutButton.addEventListener('click', async () => {
     sessionToken = null;
     clearSessionCookie();
     try { await request({ action: 'logout', token }); } catch (error) { /* Local logout still succeeds. */ }
-    window.location.replace('/');
+    showLogin();
 });
 
 checkSession();

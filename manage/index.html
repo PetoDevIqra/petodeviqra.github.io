@@ -28,6 +28,23 @@
     </header>
 
     <main>
+        <section class="login-panel" id="login-view" aria-labelledby="login-title">
+            <p class="eyebrow">Akses terbatas</p>
+            <h1 id="login-title">Masuk ke manajemen.</h1>
+            <p class="intro">Gunakan akun admin untuk membuat nomor surat dan mengelola data dokumen.</p>
+            <form id="login-form">
+                <div class="field">
+                    <label for="username">Nama pengguna</label>
+                    <input id="username" name="username" type="text" autocomplete="username" required>
+                </div>
+                <div class="field">
+                    <label for="password">Kata sandi</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required>
+                </div>
+                <p class="form-message" id="login-message" role="alert" hidden></p>
+                <button class="submit-button" type="submit">Masuk</button>
+            </form>
+        </section>
         <section class="dashboard" id="dashboard-view" aria-labelledby="dashboard-title" hidden>
             <div class="dashboard-heading">
                 <div>
