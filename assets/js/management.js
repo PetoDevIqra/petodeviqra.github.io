@@ -5,6 +5,9 @@ let sessionToken = null;
 const loginView = document.getElementById('login-view');
 const loginForm = document.getElementById('login-form');
 const loginMessage = document.getElementById('login-message');
+const passwordInput = document.getElementById('password');
+const passwordToggle = document.getElementById('password-toggle');
+const rememberInput = document.getElementById('remember');
 const dashboardView = document.getElementById('dashboard-view');
 const letterForm = document.getElementById('letter-form');
 const letterMessage = document.getElementById('letter-message');
@@ -23,8 +26,9 @@ function setBusy(button, busy) {
     button.textContent = busy ? 'Memproses...' : button.dataset.originalText;
 }
 
-function setSessionCookie(token) {
-    document.cookie = `${SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; Secure; SameSite=Lax`;
+function setSessionCookie(token, remember) {
+    const maxAge = remember ? '; Max-Age=86400' : '';
+    document.cookie = `${SESSION_COOKIE}=${encodeURIComponent(token)}${maxAge}; Path=/; Secure; SameSite=Lax`;
 }
 
 function getSessionCookie() {
@@ -69,6 +73,13 @@ function showLogin(message = '') {
     showMessage(loginMessage, message);
 }
 
+passwordToggle.addEventListener('click', () => {
+    const isVisible = passwordInput.type === 'text';
+    passwordInput.type = isVisible ? 'password' : 'text';
+    passwordToggle.setAttribute('aria-label', isVisible ? 'Tampilkan kata sandi' : 'Sembunyikan kata sandi');
+    passwordToggle.setAttribute('aria-pressed', String(!isVisible));
+});
+
 async function checkSession() {
     const cookieToken = getSessionCookie();
     if (!cookieToken) return showLogin();
@@ -95,7 +106,7 @@ loginForm.addEventListener('submit', async (event) => {
             password: formData.get('password')
         });
         sessionToken = data.token;
-        setSessionCookie(sessionToken);
+        setSessionCookie(sessionToken, rememberInput.checked);
         loginForm.reset();
         showDashboard(data);
     } catch (error) {

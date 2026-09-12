@@ -58,6 +58,7 @@ Panduan instalasi dan deployment halaman manajemen Vrai.
 
 - Jangan menyimpan password admin di repository.
 - Password hanya dikirim saat menjalankan `setAdminCredentials()` dan backend menyimpan hash-nya di Script Properties. Gunakan password minimal 12 karakter.
+- Sesi server berlaku maksimal 1 hari. Opsi `Ingat saya` membuat cookie sesi bertahan 1 hari; tanpa opsi tersebut cookie berakhir saat browser ditutup.
 - Endpoint manajemen hanya menerima aksi melalui `POST`; jangan mengirim username, password, atau token melalui URL `GET`.
 - `VERIFICATION_SECRET` wajib tersedia. Backend verifikasi akan berhenti jika property tersebut belum dikonfigurasi.
 - Batasi akses deployment Apps Script sesuai kebutuhan produksi.

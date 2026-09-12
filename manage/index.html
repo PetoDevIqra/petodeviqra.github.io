@@ -39,7 +39,15 @@
                 </div>
                 <div class="field">
                     <label for="password">Kata sandi</label>
-                    <input id="password" name="password" type="password" autocomplete="current-password" required>
+                    <div class="password-control">
+                        <input id="password" name="password" type="password" autocomplete="current-password" required>
+                        <button class="password-toggle" id="password-toggle" type="button" aria-label="Tampilkan kata sandi" aria-pressed="false">
+                            <span class="eye-icon" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-options">
+                    <label class="remember" for="remember"><input id="remember" name="remember" type="checkbox"> Ingat saya selama 1 hari</label>
                 </div>
                 <p class="form-message" id="login-message" role="alert" hidden></p>
                 <button class="submit-button" type="submit">Masuk</button>
