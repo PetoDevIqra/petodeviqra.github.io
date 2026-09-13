@@ -247,6 +247,7 @@ letterForm.addEventListener('submit', async (event) => {
             personInCharge: formData.get('personInCharge'),
             notes: formData.get('notes')
         });
+        letterForm.reset();
         document.getElementById('result-number').textContent = data.number;
         document.getElementById('result-sheet').textContent = `Sheet ${data.sheet} | Baris ${data.row}`;
         document.getElementById('result-url').value = data.qrUrl;
