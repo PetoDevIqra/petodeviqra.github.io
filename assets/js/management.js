@@ -1,6 +1,7 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbwIzQlz_v2HPai2eRfnd24BZ8JYNo5ybq-iw99gga9cv3aeeypiOLi4z8pYf_r8hpf7/exec';
 const SESSION_COOKIE = 'vrai_session';
-const SESSION_STORAGE_KEY = 'vrai_session_token';
+const SESSION_STORAGE_KEY = 'vrai_session';
+const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 let sessionToken = null;
 
 const loginView = document.getElementById('login-view');
@@ -26,25 +27,35 @@ function setBusy(button, busy) {
     button.textContent = busy ? 'Memproses...' : button.dataset.originalText;
 }
 
-function setSessionCookie(token) {
-    document.cookie = `${SESSION_COOKIE}=${encodeURIComponent(token)}; Max-Age=604800; Path=/; Secure; SameSite=Lax`;
+function saveSession(session) {
+    const value = JSON.stringify({ token: session.token, expiresAt: session.expiresAt });
+    document.cookie = `${SESSION_COOKIE}=${encodeURIComponent(value)}; Max-Age=604800; Path=/; Secure; SameSite=Lax`;
     try {
-        localStorage.setItem(SESSION_STORAGE_KEY, token);
+        localStorage.setItem(SESSION_STORAGE_KEY, value);
     } catch (error) {}
 }
 
-function getSessionCookie() {
+function readStoredSession() {
     const cookie = document.cookie.split('; ').find((item) => item.startsWith(`${SESSION_COOKIE}=`));
+    let storedValue = null;
     try {
-        const storedToken = localStorage.getItem(SESSION_STORAGE_KEY);
-        if (storedToken) return storedToken;
+        storedValue = localStorage.getItem(SESSION_STORAGE_KEY);
     } catch (error) {
         // Continue with the cookie fallback when browser storage is unavailable.
     }
-    return cookie ? decodeURIComponent(cookie.split('=').slice(1).join('=')) : null;
+    if (!storedValue && cookie) storedValue = decodeURIComponent(cookie.split('=').slice(1).join('='));
+    if (!storedValue) return null;
+    try {
+        const session = JSON.parse(storedValue);
+        if (!session.token) return null;
+        if (session.expiresAt && session.expiresAt <= Date.now()) return null;
+        return session;
+    } catch (error) {
+        return { token: storedValue, expiresAt: Date.now() + SESSION_TTL_MS };
+    }
 }
 
-function clearSessionCookie() {
+function clearStoredSession() {
     document.cookie = `${SESSION_COOKIE}=; Max-Age=0; Path=/; Secure; SameSite=Lax`;
     try {
         sessionStorage.removeItem(SESSION_STORAGE_KEY);
@@ -98,25 +109,29 @@ passwordToggle.addEventListener('click', () => {
 });
 
 async function checkSession() {
-    const cookieToken = getSessionCookie();
-    if (!cookieToken) return showLogin();
+    const storedSession = readStoredSession();
+    if (!storedSession) return showLogin();
     try {
-        sessionToken = cookieToken;
-        showDashboard(await request({ action: 'session', token: sessionToken }));
+        sessionToken = storedSession.token;
+        const data = await request({ action: 'session', token: sessionToken });
+        saveSession({ token: sessionToken, expiresAt: data.expiresAt });
+        showDashboard(data);
     } catch (error) {
         if (error.code === 'UNAUTHORIZED') {
             sessionToken = null;
-            clearSessionCookie();
+            clearStoredSession();
             showLogin('Sesi berakhir. Silakan masuk kembali.');
             return;
         }
         try {
             await new Promise((resolve) => setTimeout(resolve, 800));
-            showDashboard(await request({ action: 'session', token: sessionToken }));
+            const data = await request({ action: 'session', token: sessionToken });
+            saveSession({ token: sessionToken, expiresAt: data.expiresAt });
+            showDashboard(data);
         } catch (retryError) {
             if (retryError.code === 'UNAUTHORIZED') {
                 sessionToken = null;
-                clearSessionCookie();
+                clearStoredSession();
                 showLogin('Sesi berakhir. Silakan masuk kembali.');
                 return;
             }
@@ -138,7 +153,7 @@ loginForm.addEventListener('submit', async (event) => {
             password: formData.get('password')
         });
         sessionToken = data.token;
-        setSessionCookie(sessionToken);
+        saveSession({ token: sessionToken, expiresAt: data.expiresAt });
         loginForm.reset();
         showDashboard(data);
     } catch (error) {
@@ -178,7 +193,7 @@ letterForm.addEventListener('submit', async (event) => {
     } catch (error) {
         if (error.code === 'UNAUTHORIZED') {
             sessionToken = null;
-            clearSessionCookie();
+            clearStoredSession();
             showLogin(error.message);
         }
         showMessage(letterMessage, error.message);
@@ -205,7 +220,7 @@ document.addEventListener('click', async (event) => {
 logoutButton.addEventListener('click', async () => {
     const token = sessionToken;
     sessionToken = null;
-    clearSessionCookie();
+    clearStoredSession();
     try { await request({ action: 'logout', token }); } catch (error) { /* Local logout still succeeds. */ }
     showLogin();
 });
