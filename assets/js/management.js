@@ -1,6 +1,7 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbwIzQlz_v2HPai2eRfnd24BZ8JYNo5ybq-iw99gga9cv3aeeypiOLi4z8pYf_r8hpf7/exec';
 const SESSION_COOKIE = 'vrai_session';
 const SESSION_STORAGE_KEY = 'vrai_session';
+const LOGIN_FLAG_KEY = 'vrai_has_logged_in';
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 let sessionToken = null;
 
@@ -38,6 +39,20 @@ function saveSession(session) {
     try {
         localStorage.setItem(SESSION_STORAGE_KEY, value);
     } catch (error) {}
+}
+
+function markLoggedIn() {
+    try {
+        localStorage.setItem(LOGIN_FLAG_KEY, '1');
+    } catch (error) {}
+}
+
+function hasLoggedInBefore() {
+    try {
+        return localStorage.getItem(LOGIN_FLAG_KEY) === '1';
+    } catch (error) {
+        return false;
+    }
 }
 
 function readStoredSession() {
@@ -117,13 +132,14 @@ async function checkSession() {
     const storedSession = readStoredSession();
     if (!storedSession) return showLogin();
     sessionToken = storedSession.token;
-    if (storedSession.username && Array.isArray(storedSession.sheets) && storedSession.sheets.length) {
+    if (hasLoggedInBefore() && storedSession.username && Array.isArray(storedSession.sheets) && storedSession.sheets.length) {
         showDashboard(storedSession);
         return;
     }
     try {
         const data = await request({ action: 'session', token: sessionToken });
         saveSession({ ...storedSession, ...data, token: sessionToken });
+        markLoggedIn();
         showDashboard(data);
     } catch (error) {
         if (error.code === 'UNAUTHORIZED') {
@@ -150,6 +166,7 @@ loginForm.addEventListener('submit', async (event) => {
         });
         sessionToken = data.token;
         saveSession({ ...data, token: sessionToken });
+        markLoggedIn();
         loginForm.reset();
         showDashboard(data);
     } catch (error) {
@@ -217,6 +234,9 @@ logoutButton.addEventListener('click', async () => {
     const token = sessionToken;
     sessionToken = null;
     clearStoredSession();
+    try {
+        localStorage.removeItem(LOGIN_FLAG_KEY);
+    } catch (error) {}
     try { await request({ action: 'logout', token }); } catch (error) { /* Local logout still succeeds. */ }
     showLogin();
 });
