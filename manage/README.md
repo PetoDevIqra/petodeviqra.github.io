@@ -47,6 +47,19 @@ Panduan instalasi dan deployment halaman manajemen Vrai.
 4. Buka domain GitHub Pages atau domain pada `CNAME` untuk menguji portal.
 5. Halaman manajemen tersedia melalui `/manage/` jika folder dipublikasikan langsung, atau melalui route yang dipetakan oleh konfigurasi hosting.
 
+## Cache Edge Cloudflare
+
+Worker cache tersedia di `cloudflare/verification-worker.js`. Worker ini menyimpan hasil nomor surat yang ditemukan selama 1 jam dan hasil nomor yang belum ditemukan selama 1 menit. Apps Script tetap menjadi sumber data utama.
+
+1. Di Cloudflare, buat Worker baru dan salin isi `cloudflare/verification-worker.js`.
+2. Deploy Worker, lalu buat route seperti `api.vrai.sdislamiqrapetobo.sch.id/*` atau `/api/verification*` pada domain yang dikelola Cloudflare.
+3. Pastikan DNS domain atau subdomain tersebut menggunakan proxy Cloudflare.
+4. Uji endpoint Worker dengan `?id=09.066%2FSDIIP%2FVI%2F2026`.
+5. Setelah endpoint berhasil, ubah `API_URL` pada `assets/js/verification.js` dari URL Apps Script menjadi URL Worker.
+6. Periksa header `X-Verification-Cache`: respons pertama biasanya `MISS`, request berikutnya `HIT`.
+
+Jangan gunakan Worker ini untuk endpoint manajemen karena login dan token tidak boleh disimpan di cache publik.
+
 ## Pengujian
 
 1. Buka halaman portal dan pastikan halaman dapat dimuat.
