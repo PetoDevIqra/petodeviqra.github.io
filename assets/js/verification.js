@@ -80,7 +80,13 @@
             try {
                 const response = await fetch(url, { redirect: 'follow', cache: 'no-store', signal: controller.signal });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return await response.json();
+                const data = await response.json();
+                if (data.code === 'SERVER_ERROR') {
+                    const error = new Error(data.pesan || 'Layanan verifikasi sedang tidak tersedia.');
+                    error.code = data.code;
+                    throw error;
+                }
+                return data;
             } catch (error) {
                 lastError = error.name === 'AbortError' ? Object.assign(new Error('Permintaan melewati batas waktu.'), { name: 'TimeoutError' }) : error;
                 if (attempt + 1 < REQUEST_ATTEMPTS && Date.now() < deadline) {
