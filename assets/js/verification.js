@@ -1,5 +1,5 @@
 
-    const API_URL = "https://script.google.com/macros/s/AKfycbw-uwGdrzohv57CtzPMu9ZteTCLRKL0cafBVEgxWBDkUNtVt8dpe_SAqURi_AjTzb54/exec";
+    const API_URL = "https://api.vrai.sdislamiqrapetobo.sch.id/";
     const CACHE_LIFETIME = 5 * 60 * 1000;
     const STALE_CACHE_LIFETIME = 24 * 60 * 60 * 1000;
     const REQUEST_TOTAL_TIMEOUT = 60000;
