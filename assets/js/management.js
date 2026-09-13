@@ -16,6 +16,28 @@ const letterMessage = document.getElementById('letter-message');
 const logoutButton = document.getElementById('logout-button');
 const sheetSelect = document.getElementById('sheet');
 const resultPanel = document.getElementById('result-panel');
+const sheetHelperButton = document.getElementById('sheet-helper-button');
+const sheetHelper = document.getElementById('sheet-helper');
+const sheetHelperClose = document.getElementById('sheet-helper-close');
+const sheetHelperOptions = document.getElementById('sheet-helper-options');
+
+const sheetDescriptions = {
+    '01 SK': 'Menetapkan keputusan resmi sekolah.',
+    '02 SU': 'Mengundang orang tua, guru, instansi, atau pihak lain.',
+    '03 SPm': 'Mengajukan permohonan atau permintaan resmi.',
+    '04 Spb': 'Menyampaikan informasi atau pemberitahuan resmi.',
+    '05 SPp': 'Mengantar dokumen atau seseorang kepada pihak lain.',
+    '06 Spn': 'Menyatakan sesuatu secara resmi dan tertulis.',
+    '07 SM': 'Memberikan mandat atau wewenang kepada seseorang.',
+    '08 ST': 'Menugaskan guru, pegawai, atau pihak tertentu.',
+    '09 Sket': 'Menerangkan status, kondisi, atau identitas seseorang.',
+    '10 SR': 'Memberikan rekomendasi resmi dari sekolah.',
+    '11 SB': 'Menyampaikan berita atau laporan resmi sekolah.',
+    '12 SPPD': 'Mencatat keperluan perjalanan dinas.',
+    '13 SRT': 'Menerbitkan surat tugas sesuai jenis administrasi ini.',
+    '14 PK': 'Membuat perjanjian kerja.',
+    '15 SPeng': 'Mengesahkan dokumen atau keputusan resmi.'
+};
 
 function showMessage(element, message) {
     element.textContent = message || '';
@@ -119,6 +141,37 @@ function showLogin(message = '') {
     logoutButton.hidden = true;
     showMessage(loginMessage, message);
 }
+
+function closeSheetHelper() {
+    sheetHelper.hidden = true;
+    sheetHelperButton.focus();
+}
+
+function openSheetHelper() {
+    sheetHelperOptions.replaceChildren(...Array.from(sheetSelect.options).map((option) => {
+        const button = document.createElement('button');
+        button.className = 'helper-option';
+        button.type = 'button';
+        button.dataset.sheet = option.value;
+        button.innerHTML = `<strong>${option.textContent}</strong><span>${sheetDescriptions[option.value] || 'Pilih jenis surat ini untuk melanjutkan.'}</span>`;
+        button.addEventListener('click', () => {
+            sheetSelect.value = option.value;
+            closeSheetHelper();
+        });
+        return button;
+    }));
+    sheetHelper.hidden = false;
+    sheetHelperClose.focus();
+}
+
+sheetHelperButton.addEventListener('click', openSheetHelper);
+sheetHelperClose.addEventListener('click', closeSheetHelper);
+sheetHelper.addEventListener('click', (event) => {
+    if (event.target === sheetHelper) closeSheetHelper();
+});
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !sheetHelper.hidden) closeSheetHelper();
+});
 
 passwordToggle.addEventListener('click', () => {
     const isVisible = passwordInput.type === 'text';

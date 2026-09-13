@@ -69,6 +69,7 @@
                         <label for="sheet">Jenis surat</label>
                         <select id="sheet" name="sheet" required></select>
                         <p class="field-hint">Pilih jenis surat yang akan dibuat.</p>
+                        <button class="helper-button" id="sheet-helper-button" type="button">Bantu pilih jenis surat</button>
                     </div>
                     <div class="field">
                         <label for="date">Tanggal surat</label>
@@ -119,10 +120,24 @@
         </section>
     </main>
 
+    <div class="helper-dialog" id="sheet-helper" role="dialog" aria-modal="true" aria-labelledby="sheet-helper-title" hidden>
+        <div class="helper-dialog-panel">
+            <div class="helper-dialog-header">
+                <div>
+                    <p class="eyebrow">Panduan singkat</p>
+                    <h2 id="sheet-helper-title">Jenis surat untuk kebutuhan Anda.</h2>
+                </div>
+                <button class="helper-close" id="sheet-helper-close" type="button" aria-label="Tutup bantuan">&times;</button>
+            </div>
+            <p class="helper-intro">Pilih kegunaan yang paling sesuai. Jenis surat akan terisi otomatis pada formulir.</p>
+            <div class="helper-options" id="sheet-helper-options"></div>
+        </div>
+    </div>
+
     <footer class="site-footer">
         <p>&copy; 2026 Vrai | SD Islam Iqra Petobo</p>
     </footer>
 </div>
-<script src="/assets/js/management.js?v=20260918" defer></script>
+<script src="/assets/js/management.js?v=20260923" defer></script>
 </body>
 </html>
