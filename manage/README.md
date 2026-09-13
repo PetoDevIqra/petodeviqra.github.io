@@ -26,6 +26,8 @@ Panduan instalasi dan deployment halaman manajemen Vrai.
 
    `01 SK`, `02 SU`, `03 SPm`, `04 Spb`, `05 SPp`, `06 Spn`, `07 SM`, `08 ST`, `09 Sket`, `10 SR`, `11 SB`, `12 SPPD`, `13 SRT`, `14 PK`, `15 SPeng`.
 
+   Setiap sheet menggunakan kolom audit `DIBUAT PADA` dan `DIBUAT OLEH`. Kolom tersebut diisi otomatis dari waktu server dan username session admin saat nomor surat dibuat.
+
 6. Pada project Apps Script verification, jalankan `rebuildVerificationIndex()` satu kali setelah data sheet siap. Fungsi ini membuat index nomor surat untuk mempercepat pencarian.
 7. Berikan izin yang diminta Google Apps Script.
 8. Pada project Apps Script yang berisi `Code.gs` root untuk verifikasi publik, buka **Project Settings > Script properties**, lalu tambahkan property `VERIFICATION_SECRET` dengan nilai acak yang panjang.
