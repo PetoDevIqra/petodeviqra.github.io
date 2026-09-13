@@ -5,6 +5,10 @@ const NOT_FOUND_TTL = 60;
 
 export default {
   async fetch(request, env, ctx) {
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { status: 204, headers: corsHeaders() });
+    }
+
     if (request.method !== 'GET') {
       return jsonResponse({ ok: false, code: 'METHOD_NOT_ALLOWED' }, 405);
     }
@@ -71,7 +75,8 @@ export default {
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
         'Cache-Control': `public, max-age=0, s-maxage=${ttl}`,
-        'X-Verification-Cache': 'MISS'
+        'X-Verification-Cache': 'MISS',
+        ...corsHeaders()
       }
     });
 
@@ -85,7 +90,8 @@ function jsonResponse(data, status) {
     status,
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store'
+      'Cache-Control': 'no-store',
+      ...corsHeaders()
     }
   });
 }
@@ -93,9 +99,20 @@ function jsonResponse(data, status) {
 function withHeader(response, name, value) {
   const headers = new Headers(response.headers);
   headers.set(name, value);
+  Object.entries(corsHeaders()).forEach(([headerName, headerValue]) => {
+    headers.set(headerName, headerValue);
+  });
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
     headers
   });
+}
+
+function corsHeaders() {
+  return {
+    'Access-Control-Allow-Origin': 'https://vrai.sdislamiqrapetobo.sch.id',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type'
+  };
 }
