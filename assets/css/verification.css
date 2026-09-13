@@ -62,6 +62,9 @@
         .loader-ring { width: 30px; height: 30px; margin: 0 auto 18px; border: 2px solid var(--line); border-top-color: var(--red); border-radius: 50%; animation: spin 850ms linear infinite; }
         .state-title { margin: 0 0 8px; color: var(--navy); font-family: Newsreader, Georgia, serif; font-size: 2rem; font-weight: 500; }
         .state-copy { max-width: 370px; margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.6; }
+        .retry-button { margin-top: 20px; padding: 11px 16px; color: var(--paper); background: var(--navy); border: 0; cursor: pointer; font: inherit; font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+        .retry-button:hover { background: var(--navy-dark); }
+        .retry-button:disabled { cursor: wait; opacity: .65; }
         .state[data-tone="error"] .state-title { color: var(--red); }
         @keyframes spin { to { transform: rotate(360deg); } }
 

@@ -26,15 +26,16 @@ Panduan instalasi dan deployment halaman manajemen Vrai.
 
    `01 SK`, `02 SU`, `03 SPm`, `04 Spb`, `05 SPp`, `06 Spn`, `07 SM`, `08 ST`, `09 Sket`, `10 SR`, `11 SB`, `12 SPPD`, `13 SRT`, `14 PK`, `15 SPeng`.
 
-5. Berikan izin yang diminta Google Apps Script.
-6. Pada project Apps Script yang berisi `Code.gs` root untuk verifikasi publik, buka **Project Settings > Script properties**, lalu tambahkan property `VERIFICATION_SECRET` dengan nilai acak yang panjang.
-7. Jalankan fungsi `setAdminCredentials('nama-pengguna', 'password-minimal-12-karakter')` untuk membuat akun admin pertama. Password wajib minimal 12 karakter.
-8. Untuk menambah atau memperbarui akun, jalankan fungsi yang sama dengan username dan password yang baru.
-9. Pilih **Deploy > New deployment**.
-10. Pilih tipe **Web app**.
-11. Atur **Execute as** ke akun pemilik script dan atur akses sesuai kebutuhan.
-12. Deploy, lalu salin URL yang berakhiran `/exec`.
-13. Masukkan URL tersebut sebagai `API_URL` di `assets/js/management.js`.
+6. Pada project Apps Script verification, jalankan `rebuildVerificationIndex()` satu kali setelah data sheet siap. Fungsi ini membuat index nomor surat untuk mempercepat pencarian.
+7. Berikan izin yang diminta Google Apps Script.
+8. Pada project Apps Script yang berisi `Code.gs` root untuk verifikasi publik, buka **Project Settings > Script properties**, lalu tambahkan property `VERIFICATION_SECRET` dengan nilai acak yang panjang.
+9. Jalankan fungsi `setAdminCredentials('nama-pengguna', 'password-minimal-12-karakter')` untuk membuat akun admin pertama. Password wajib minimal 12 karakter.
+10. Untuk menambah atau memperbarui akun, jalankan fungsi yang sama dengan username dan password yang baru.
+11. Pilih **Deploy > New deployment**.
+12. Pilih tipe **Web app**.
+13. Atur **Execute as** ke akun pemilik script dan atur akses sesuai kebutuhan.
+14. Deploy, lalu salin URL yang berakhiran `/exec`.
+15. Masukkan URL tersebut sebagai `API_URL` di `assets/js/management.js`.
 
 ## Deployment Frontend
 

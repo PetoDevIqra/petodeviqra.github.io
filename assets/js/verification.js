@@ -14,6 +14,7 @@
     const result = document.getElementById('result');
     const surfaceLabel = document.getElementById('surface-label');
     const surfaceId = document.getElementById('surface-id');
+    const retryButton = document.getElementById('retry-button');
 
     function setText(id, value) {
         document.getElementById(id).textContent = value || '-';
@@ -24,6 +25,7 @@
         emptyState.hidden = true;
         invalidState.hidden = true;
         result.hidden = true;
+        retryButton.hidden = true;
     }
 
     function showData(data) {
@@ -33,6 +35,13 @@
             emptyState.querySelector('.state-title').textContent = 'Nomor ganda.';
             emptyState.querySelector('.state-copy').textContent = 'Nomor surat ini tercatat lebih dari satu kali. Hubungi administrator untuk memperbaiki data resminya.';
             surfaceLabel.textContent = 'Data tidak konsisten';
+            return;
+        }
+        if (data?.code === 'INVALID_FORMAT' || data?.code === 'ID_TOO_LONG') {
+            emptyState.hidden = false;
+            emptyState.querySelector('.state-title').textContent = 'Nomor tidak valid.';
+            emptyState.querySelector('.state-copy').textContent = data.pesan || 'Format nomor surat tidak sesuai.';
+            surfaceLabel.textContent = 'Format tidak valid';
             return;
         }
         if (!data || !data.ditemukan) {
@@ -86,7 +95,11 @@
             const timeoutId = setTimeout(() => controller.abort(), attemptTimeout);
             try {
                 const response = await fetch(url, { redirect: 'follow', cache: 'no-store', signal: controller.signal });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                if (!response.ok) {
+                    const error = new Error(`HTTP ${response.status}`);
+                    error.name = 'HttpError';
+                    throw error;
+                }
                 const data = await response.json();
                 if (data.code === 'SERVER_ERROR') {
                     const error = new Error(data.pesan || 'Layanan verifikasi sedang tidak tersedia.');
@@ -113,7 +126,7 @@
         }
 
         surfaceId.textContent = idSurat;
-        const cacheKey = `surat-v4-${idSurat}-${kodeSurat || 'record'}`;
+        const cacheKey = `surat-v5-${idSurat}-${kodeSurat || 'record'}`;
         let cachedRecord;
         try {
             const cached = JSON.parse(localStorage.getItem(cacheKey));
@@ -138,17 +151,31 @@
         } catch (error) {
             if (cachedRecord) {
                 surfaceLabel.textContent = 'Data tersimpan';
+                retryButton.hidden = false;
                 return;
             }
             hideStates();
             emptyState.hidden = false;
             const timedOut = error?.name === 'TimeoutError';
-            emptyState.querySelector('.state-title').textContent = timedOut ? 'Layanan terlalu lama.' : 'Layanan belum merespons.';
+            const serverError = error?.code === 'SERVER_ERROR' || error?.name === 'HttpError';
+            const offline = error?.name === 'TypeError';
+            emptyState.querySelector('.state-title').textContent = timedOut
+                ? 'Layanan terlalu lama.'
+                : serverError ? 'Layanan sedang bermasalah.' : offline ? 'Koneksi tidak tersedia.' : 'Permintaan gagal.';
             emptyState.querySelector('.state-copy').textContent = timedOut
-                ? 'Server membutuhkan waktu lebih lama dari biasanya. Silakan buka kembali QR dokumen beberapa saat lagi.'
-                : 'Data belum dapat dimuat. Periksa koneksi internet lalu coba buka kembali QR dokumen.';
-            surfaceLabel.textContent = timedOut ? 'Waktu habis' : 'Permintaan gagal';
+                ? 'Server membutuhkan waktu lebih lama dari biasanya. Coba ulangi beberapa saat lagi.'
+                : serverError ? 'Server verifikasi sedang tidak dapat memproses permintaan. Coba lagi nanti.'
+                    : offline ? 'Periksa koneksi internet, lalu coba ulangi pemeriksaan.'
+                        : 'Data belum dapat dimuat. Coba ulangi pemeriksaan.';
+            surfaceLabel.textContent = timedOut ? 'Waktu habis' : serverError ? 'Server bermasalah' : offline ? 'Tidak terhubung' : 'Permintaan gagal';
+            retryButton.hidden = false;
         }
     }
+
+    retryButton.addEventListener('click', async () => {
+        retryButton.disabled = true;
+        await loadDocument();
+        retryButton.disabled = false;
+    });
 
     loadDocument();
