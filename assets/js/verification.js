@@ -2,8 +2,8 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbw-uwGdrzohv57CtzPMu9ZteTCLRKL0cafBVEgxWBDkUNtVt8dpe_SAqURi_AjTzb54/exec";
     const CACHE_LIFETIME = 5 * 60 * 1000;
     const STALE_CACHE_LIFETIME = 24 * 60 * 60 * 1000;
-    const REQUEST_TIMEOUT = 45000;
-    const REQUEST_ATTEMPTS = 3;
+    const REQUEST_TOTAL_TIMEOUT = 60000;
+    const REQUEST_ATTEMPTS = 2;
     const params = new URLSearchParams(window.location.search);
     const idSurat = params.get('id')?.trim() || '';
     const kodeSurat = params.get('kode')?.trim() || '';
@@ -69,21 +69,28 @@
 
     async function requestDocument(url) {
         let lastError;
+        const deadline = Date.now() + REQUEST_TOTAL_TIMEOUT;
         for (let attempt = 0; attempt < REQUEST_ATTEMPTS; attempt += 1) {
+            const remainingTime = deadline - Date.now();
+            if (remainingTime <= 0) break;
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+            const attemptsLeft = REQUEST_ATTEMPTS - attempt;
+            const attemptTimeout = Math.min(remainingTime, Math.max(10000, Math.floor(remainingTime / attemptsLeft)));
+            const timeoutId = setTimeout(() => controller.abort(), attemptTimeout);
             try {
                 const response = await fetch(url, { redirect: 'follow', cache: 'no-store', signal: controller.signal });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 return await response.json();
             } catch (error) {
-                lastError = error;
-                if (attempt + 1 < REQUEST_ATTEMPTS) await new Promise((resolve) => setTimeout(resolve, 1200));
+                lastError = error.name === 'AbortError' ? Object.assign(new Error('Permintaan melewati batas waktu.'), { name: 'TimeoutError' }) : error;
+                if (attempt + 1 < REQUEST_ATTEMPTS && Date.now() < deadline) {
+                    await new Promise((resolve) => setTimeout(resolve, Math.min(1000, deadline - Date.now())));
+                }
             } finally {
                 clearTimeout(timeoutId);
             }
         }
-        throw lastError;
+        throw lastError || Object.assign(new Error('Permintaan melewati batas waktu.'), { name: 'TimeoutError' });
     }
 
     async function loadDocument() {
@@ -122,7 +129,7 @@
             }
             hideStates();
             emptyState.hidden = false;
-            const timedOut = error?.name === 'AbortError';
+            const timedOut = error?.name === 'TimeoutError';
             emptyState.querySelector('.state-title').textContent = timedOut ? 'Layanan terlalu lama.' : 'Layanan belum merespons.';
             emptyState.querySelector('.state-copy').textContent = timedOut
                 ? 'Server membutuhkan waktu lebih lama dari biasanya. Silakan buka kembali QR dokumen beberapa saat lagi.'
