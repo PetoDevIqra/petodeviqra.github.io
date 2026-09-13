@@ -82,3 +82,7 @@ Jalankan `setupSpreadsheet()` dan pastikan nama sheet tidak diubah.
 ### Nomor surat berhasil dibuat tetapi QR tidak dapat diverifikasi
 
 Periksa `verificationBaseUrl` di `manage/Code.gs` dan pastikan backend verifikasi pada `Code.gs` root sudah dipublikasikan.
+
+### Nomor surat terdeteksi ganda
+
+Pembuatan nomor baru akan melewati nomor yang sudah ada pada sheet. Jika data lama sudah memiliki nomor yang sama lebih dari satu kali, verification akan menampilkan status `Nomor ganda`; hapus atau koreksi salah satu baris duplikat di spreadsheet.

@@ -28,6 +28,13 @@
 
     function showData(data) {
         hideStates();
+        if (data?.code === 'DUPLICATE_NUMBER') {
+            emptyState.hidden = false;
+            emptyState.querySelector('.state-title').textContent = 'Nomor ganda.';
+            emptyState.querySelector('.state-copy').textContent = 'Nomor surat ini tercatat lebih dari satu kali. Hubungi administrator untuk memperbaiki data resminya.';
+            surfaceLabel.textContent = 'Data tidak konsisten';
+            return;
+        }
         if (!data || !data.ditemukan) {
             emptyState.hidden = false;
             surfaceLabel.textContent = 'Tidak ditemukan';
