@@ -28,7 +28,12 @@ function setBusy(button, busy) {
 }
 
 function saveSession(session) {
-    const value = JSON.stringify({ token: session.token, expiresAt: session.expiresAt });
+    const value = JSON.stringify({
+        token: session.token,
+        username: session.username || '',
+        sheets: session.sheets || [],
+        expiresAt: session.expiresAt || Date.now() + SESSION_TTL_MS
+    });
     document.cookie = `${SESSION_COOKIE}=${encodeURIComponent(value)}; Max-Age=604800; Path=/; Secure; SameSite=Lax`;
     try {
         localStorage.setItem(SESSION_STORAGE_KEY, value);
@@ -111,10 +116,14 @@ passwordToggle.addEventListener('click', () => {
 async function checkSession() {
     const storedSession = readStoredSession();
     if (!storedSession) return showLogin();
+    sessionToken = storedSession.token;
+    if (storedSession.username && Array.isArray(storedSession.sheets) && storedSession.sheets.length) {
+        showDashboard(storedSession);
+        return;
+    }
     try {
-        sessionToken = storedSession.token;
         const data = await request({ action: 'session', token: sessionToken });
-        saveSession({ token: sessionToken, expiresAt: data.expiresAt });
+        saveSession({ ...storedSession, ...data, token: sessionToken });
         showDashboard(data);
     } catch (error) {
         if (error.code === 'UNAUTHORIZED') {
@@ -123,20 +132,7 @@ async function checkSession() {
             showLogin('Sesi berakhir. Silakan masuk kembali.');
             return;
         }
-        try {
-            await new Promise((resolve) => setTimeout(resolve, 800));
-            const data = await request({ action: 'session', token: sessionToken });
-            saveSession({ token: sessionToken, expiresAt: data.expiresAt });
-            showDashboard(data);
-        } catch (retryError) {
-            if (retryError.code === 'UNAUTHORIZED') {
-                sessionToken = null;
-                clearStoredSession();
-                showLogin('Sesi berakhir. Silakan masuk kembali.');
-                return;
-            }
-            showLogin('Layanan sesi sedang tidak tersedia. Coba muat ulang halaman.');
-        }
+        showLogin('Layanan sesi sedang tidak tersedia. Coba muat ulang halaman.');
     }
 }
 
@@ -153,7 +149,7 @@ loginForm.addEventListener('submit', async (event) => {
             password: formData.get('password')
         });
         sessionToken = data.token;
-        saveSession({ token: sessionToken, expiresAt: data.expiresAt });
+        saveSession({ ...data, token: sessionToken });
         loginForm.reset();
         showDashboard(data);
     } catch (error) {
