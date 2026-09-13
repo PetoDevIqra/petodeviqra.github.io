@@ -8,7 +8,6 @@ const loginForm = document.getElementById('login-form');
 const loginMessage = document.getElementById('login-message');
 const passwordInput = document.getElementById('password');
 const passwordToggle = document.getElementById('password-toggle');
-const rememberInput = document.getElementById('remember');
 const dashboardView = document.getElementById('dashboard-view');
 const letterForm = document.getElementById('letter-form');
 const letterMessage = document.getElementById('letter-message');
@@ -27,20 +26,17 @@ function setBusy(button, busy) {
     button.textContent = busy ? 'Memproses...' : button.dataset.originalText;
 }
 
-function setSessionCookie(token, remember) {
-    const maxAge = remember ? '; Max-Age=604800' : '';
-    document.cookie = `${SESSION_COOKIE}=${encodeURIComponent(token)}${maxAge}; Path=/; Secure; SameSite=Lax`;
+function setSessionCookie(token) {
+    document.cookie = `${SESSION_COOKIE}=${encodeURIComponent(token)}; Max-Age=604800; Path=/; Secure; SameSite=Lax`;
     try {
-        sessionStorage.setItem(SESSION_STORAGE_KEY, token);
-        if (remember) localStorage.setItem(SESSION_STORAGE_KEY, token);
-        else localStorage.removeItem(SESSION_STORAGE_KEY);
+        localStorage.setItem(SESSION_STORAGE_KEY, token);
     } catch (error) {}
 }
 
 function getSessionCookie() {
     const cookie = document.cookie.split('; ').find((item) => item.startsWith(`${SESSION_COOKIE}=`));
     try {
-        const storedToken = sessionStorage.getItem(SESSION_STORAGE_KEY) || localStorage.getItem(SESSION_STORAGE_KEY);
+        const storedToken = localStorage.getItem(SESSION_STORAGE_KEY);
         if (storedToken) return storedToken;
     } catch (error) {
         // Continue with the cookie fallback when browser storage is unavailable.
@@ -142,7 +138,7 @@ loginForm.addEventListener('submit', async (event) => {
             password: formData.get('password')
         });
         sessionToken = data.token;
-        setSessionCookie(sessionToken, rememberInput.checked);
+        setSessionCookie(sessionToken);
         loginForm.reset();
         showDashboard(data);
     } catch (error) {
